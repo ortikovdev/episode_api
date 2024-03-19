@@ -40,7 +40,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'rest_framework.authtoken',
     # 'psycopg2',
-    'rest_framework.simplejwt',
+    'rest_framework.simpl2ejwt',
     'drf_yasg',
 
     'apps.account',
