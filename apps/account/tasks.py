@@ -1,13 +1,23 @@
-from django.contrib.auth import get_user_model
-from config.celery import app
+import os
+
+from django.contrib.auth.tokens import PasswordResetTokenGenerator
 from django.core.mail import send_mail
 from django.conf import settings
+from django.utils.encoding import smart_bytes
+from django.utils.http import urlsafe_base64_encode
+
+from config.celery import app
 
 
 @app.task()
-def send_mail_resset_passwd(user):
+def send_mail_reset_passwd(user):
     subject = 'Hi! man'
-    message = f'Reset Your Password'
+    uidb64 = urlsafe_base64_encode(smart_bytes(user.id))
+    token = PasswordResetTokenGenerator().make_token(user)
+    current_site = os.getenv('SITE_NAME')
+    protocol = os.getenv('PROTOCOL')
+    abs_url = f"{protocol}://{current_site}/change-password-confirm/{uidb64}/{token}/"
+    message = f'Reset Your Password Link:\n {abs_url}'
     send_mail(subject=subject,
               message=message,
               from_email=settings.EMAIL_HOST_USER,
