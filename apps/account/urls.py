@@ -5,7 +5,14 @@ from rest_framework_simplejwt.views import (
     TokenVerifyView,
     TokenBlacklistView,
 )
-from .views import UserRegisterAPIView, MyProfileAPIView
+from .views import (
+    UserRegisterAPIView,
+    MyProfileAPIView,
+    ResetPassword,
+    PasswordTokenCheckView,
+    SetPasswordView,
+)
+
 urlpatterns = [
     path('api/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
     path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
@@ -13,5 +20,8 @@ urlpatterns = [
     path('api/token/blacklist/', TokenBlacklistView.as_view(), name='token_blacklist'),
     path('api/register/', UserRegisterAPIView.as_view(), name='register'),
     path('api/profile/', MyProfileAPIView.as_view(), name='profile'),
+    path('api/reset/passwd/', ResetPassword.as_view(), name='reset'),
+    path('api/check/passwd/<str:uidb64>/<str:token>/', PasswordTokenCheckView.as_view(), name='check_passwd'),
+    path('api/set/passwd/', SetPasswordView.as_view(), name='set_new_passwd'),
 ]
 

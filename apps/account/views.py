@@ -7,7 +7,7 @@ from rest_framework import generics
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from .models import User
-from .serializers import UserRegisterSerializer, UserSerializer, ResetPasswordSerializer
+from .serializers import UserRegisterSerializer, UserSerializer, ResetPasswordSerializer, SetNewPasswordSerializer
 from .tasks import send_mail_reset_passwd
 
 
@@ -33,8 +33,8 @@ class ResetPassword(generics.GenericAPIView):
     queryset = User.objects.all()
 
     def post(self, request, *args, **kwargs):
-        user = User.objects.get(email=request.data['email'])
-        send_mail_reset_passwd(user)
+        email = User.objects.get(email=request.data['email']).email
+        send_mail_reset_passwd.delay(email)
         return Response({"detail": "Reset link was sent to your email"})
 
 

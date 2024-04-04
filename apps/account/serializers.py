@@ -1,6 +1,11 @@
+from django.contrib.auth.tokens import PasswordResetTokenGenerator
+from django.utils.encoding import force_str
+from django.utils.http import urlsafe_base64_decode
 from rest_framework import serializers
 from django.contrib.auth.password_validation import validate_password
 from rest_framework.exceptions import ValidationError
+from rest_framework_simplejwt.exceptions import AuthenticationFailed
+
 from .models import User
 
 
@@ -51,3 +56,28 @@ class SetNewPasswordSerializer(serializers.ModelSerializer):
             model = User
             fields = ['password', 'password2', 'uidb64', 'token']
 
+        def validate(self, attrs):
+            password = attrs.get('password')
+            password2 = attrs.get('password2')
+            uidb64 = attrs.get('uidb64')
+            token = attrs.get('token')
+            _id = force_str(urlsafe_base64_decode(uidb64))
+            user = User.objects.get(id=_id)
+            if not PasswordResetTokenGenerator().check_token(user, token):
+                raise AuthenticationFailed({"success": False, "detail": "Wrong token"})
+            if password != password2:
+                raise serializers.ValidationError({"success": False, "detail": "Passwords don't match"})
+
+            user.set_password(password)
+            user.save()
+            return user
+
+        def create(self, validated_data):
+            password = validated_data.pop('password')
+            password2 = validated_data.pop('password2')
+            uidb64 = validated_data.get('uidb64')
+            _id = force_str(urlsafe_base64_decode(uidb64))
+            user = User.objects.get(id=_id)
+            user.set_password(password)
+            user.save()
+            return user
