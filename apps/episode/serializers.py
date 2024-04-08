@@ -46,3 +46,10 @@ class EpisodeCommentSerializer(serializers.ModelSerializer):
         episode_id = self.context['episode_id']
         validated_data['episode_id'] = episode_id
         return super().create(validated_data)
+
+
+class EpisodeLikeSerializer(serializers.Serializer):
+    episode_id = serializers.IntegerField(write_only=True)
+
+    class Meta:
+        fields = ['episode_id']
