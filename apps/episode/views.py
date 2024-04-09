@@ -1,5 +1,5 @@
 from django.shortcuts import get_object_or_404
-from rest_framework import generics, views, viewsets
+from rest_framework import generics, viewsets
 from rest_framework.permissions import IsAuthenticatedOrReadOnly, IsAuthenticated
 from rest_framework.response import Response
 
@@ -12,11 +12,13 @@ from .permissions import IsAuthorOrReadOnly
 class CategoryListAPIView(generics.ListAPIView):
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
+    pagination_class = None
 
 
 class TagListAPIView(generics.ListAPIView):
     queryset = Tag.objects.all()
     serializer_class = TagSerializer
+    pagination_class = None
 
 
 class EpisodeListAPIView(viewsets.ModelViewSet):
@@ -34,11 +36,11 @@ class EpisodeListAPIView(viewsets.ModelViewSet):
 class EpisodeCommentAPIView(generics.ListCreateAPIView):
     # /episode/{episode_id}/comments/
     queryset = EpisodeComment.objects.all()
-    serializer_class = EpisodeSerializer
+    serializer_class = EpisodeCommentSerializer
     permission_classes = [IsAuthenticatedOrReadOnly]
 
     def get_serializer_context(self):
-        ctx = super().get_serializer_class()
+        ctx = super().get_serializer_context()
         episode_id = self.kwargs.get('episode_id')
         ctx['episode_id'] = episode_id
         return ctx
@@ -76,8 +78,9 @@ class LikeAPIView(generics.CreateAPIView):
             }
         """
         episode_id = request.data.get('episode_id')
+        get_object_or_404(Episode, id=episode_id)
         user_id = request.user.id
-        has_like = EpisodeLike.objects.filter(EpisodeLike, episode_id=episode_id, author_id=user_id)
+        has_like = EpisodeLike.objects.filter(episode_id=episode_id, author_id=user_id)
         if has_like.exists():
             has_like.delete()
             return Response({"detail": "Episode removed from liked list"})

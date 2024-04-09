@@ -2,6 +2,19 @@ from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 from .models import User
 from .forms import UserCreationForm, UserChangeForm
+from ..episode.models import Category, Tag
+
+
+@admin.register(Category)
+class CategoryAdmin(admin.ModelAdmin):
+    list_display = ("id", "title", "created_date")
+    search_fields = ("title", )
+
+
+@admin.register(Tag)
+class TagAdmin(admin.ModelAdmin):
+    list_display = ("id", "title", "created_date")
+    search_fields = ("title", )
 
 
 @admin.register(User)

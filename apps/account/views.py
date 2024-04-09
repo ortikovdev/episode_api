@@ -40,6 +40,7 @@ class ResetPassword(generics.GenericAPIView):
 
 class PasswordTokenCheckView(generics.GenericAPIView):
     # http://127.0.0.1:8000/user/v1/password-change-confirm/<uidb64>/<token/>
+    serializer_class = ResetPasswordSerializer
     def get(self, request, uidb64, *args, **kwargs):
         try:
             user_id = smart_str(urlsafe_base64_decode(uidb64))
