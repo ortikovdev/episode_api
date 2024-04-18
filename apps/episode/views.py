@@ -2,11 +2,12 @@ from django.shortcuts import get_object_or_404
 from rest_framework import generics, viewsets
 from rest_framework.permissions import IsAuthenticatedOrReadOnly, IsAuthenticated
 from rest_framework.response import Response
-
+from django_filters import rest_framework as filterset
 from .models import Category, Tag, Episode, EpisodeComment, EpisodeLike
 from .serializers import CategorySerializer, TagSerializer, EpisodeSerializer, EpisodePostSerializer, \
     EpisodeCommentSerializer, EpisodeLikeSerializer
 from .permissions import IsAuthorOrReadOnly
+from .filters import EpisodeFilter
 
 
 class CategoryListAPIView(generics.ListAPIView):
@@ -26,6 +27,9 @@ class EpisodeListAPIView(viewsets.ModelViewSet):
     serializer_class = EpisodeSerializer
     serializer_post_class = EpisodePostSerializer
     permission_classes = [IsAuthorOrReadOnly]
+    filter_backends = (filterset.DjangoFilterBackend,)
+    filter_class = [EpisodeFilter]
+    filterset_fileds = ['title']
 
     def get_serializer_class(self):
         if self.request.method == 'GET':
